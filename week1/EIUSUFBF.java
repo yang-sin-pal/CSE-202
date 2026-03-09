@@ -1,19 +1,21 @@
-﻿import java.io.FileInputStream;
+﻿package week1;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-public class EIUDEG {
-    static StringBuilder sb = new StringBuilder();
+public class EIUSUFBF {
+static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         InputReader sc = new InputReader(System.in);
         int n = sc.nextInt();
         int m = sc.nextInt();
-        Vertex[] graph = new Vertex[n + 1];
-        for (int i = 1; i <= n; i++) {
+        int q = sc.nextInt();
+        Vertex[] graph = new Vertex[n];
+        for (int i = 0; i < n; i++) {
             graph[i] = new Vertex(i);
         }
         for (int i = 0; i < m; i++) {
@@ -22,9 +24,18 @@ public class EIUDEG {
             graph[v].adjacentList.add(graph[u]);
             graph[u].adjacentList.add(graph[v]);
         }
-        for (int i = 1; i <= n; i++) {
-            sb.append(graph[i].adjacentList.size());
-            sb.append(" ");
+        for (int i = 0; i < n; i++) {
+            List<Vertex> termList = graph[i].adjacentList;
+            sb.append(i + " ");
+            termList.sort((v1,v2) -> {
+                return Integer.compare(v1.id, v2.id);
+            });
+            for (Vertex vertex : termList) {
+                if (vertex.adjacentList.size() < q) {
+                    sb.append(vertex.id + " ");
+                }
+            }
+            sb.append("\n");
         }
         System.out.println(sb);
     }
@@ -35,7 +46,9 @@ public class EIUDEG {
 
         public Vertex(int id) {
             this.id = id;
+            
         }
+
     }
 
     static class InputReader {
@@ -164,5 +177,5 @@ public class EIUDEG {
                 b = readByte();
             }
         }
-    }
+    }   
 }

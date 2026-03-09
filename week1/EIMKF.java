@@ -1,42 +1,39 @@
-﻿import java.io.FileInputStream;
+﻿package week1;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-public class EICON {
+ public class EIMKF {
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         InputReader sc = new InputReader(System.in);
         int n = sc.nextInt();
         int m = sc.nextInt();
-        int q = sc.nextInt();
-        Vertex[] graph = new Vertex[n + 1];
-        for (int i = 1; i <= n; i++) {
+        Vertex[] graph = new Vertex[n];
+        for (int i = 0; i < n; i++) {
             graph[i] = new Vertex(i);
         }
         for (int i = 0; i < m; i++) {
             int u = sc.nextInt();
             int v = sc.nextInt();
             graph[v].adjacentList.add(graph[u]);
+            graph[u].adjacentList.add(graph[v]);
         }
-        for (int i = 0; i < q; i++) {
-            boolean flag = false;
-            int a = sc.nextInt();
-            int b = sc.nextInt();
-            for (Vertex vertex : graph[a].adjacentList) {
-                if (vertex.id == b) {
-                    flag = true;
-                    break;
-                }
+        for (int i = 0; i < n; i++) {
+            List<Vertex> termList = graph[i].adjacentList;
+            sb.append(i + " ");
+            sb.append(termList.size() + " ");
+            termList.sort((v1,v2) -> {
+                return Integer.compare(v1.id, v2.id);
+            });
+            for (Vertex vertex : termList) {
+                sb.append(vertex.id + " ");
             }
-            if (flag) {
-                sb.append("Y\n");
-            } else {
-                sb.append("N\n");
-            }
+            sb.append("\n");
         }
         System.out.println(sb);
     }

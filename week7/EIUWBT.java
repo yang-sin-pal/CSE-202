@@ -1,66 +1,102 @@
-﻿import java.io.FileInputStream;
+﻿package week7;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-public class EIHCON {
+public class EIUWBT {
     static StringBuilder sb = new StringBuilder();
+    static InputReader sc;
+    static {
+        try {
+            sc = new InputReader(System.in);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-    public static void main(String[] args) throws IOException {
-        InputReader sc = new InputReader(System.in);
-        int n = sc.nextInt();
-        int m = sc.nextInt();
-        int q = sc.nextInt();
-        Vertex[] graph = new Vertex[n + 1];
-        for (int i = 1; i <= n; i++) {
-            graph[i] = new Vertex(i);
-        }
-        for (int i = 0; i < m; i++) {
-            int u = sc.nextInt();
-            int v = sc.nextInt();
-            graph[v].adjacentList.add(graph[u]);
-        }
-        for (int i = 0; i < q; i++) {
-            boolean flag = false;
-            int a = sc.nextInt();
-            int b = sc.nextInt();
-            for (Vertex vertex : graph[a].adjacentList) {
-                if (vertex.id == b) {
-                    flag = true;
-                    break;
-                }
-            }
-            if (flag == false) {
-                for (Vertex vertex : graph[a].adjacentList) {
-                    for (Vertex vertex2 : vertex.adjacentList) {
-                        if (vertex2.id == b) {
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if (flag) {
-                        break;
-                    }
-                }
-            }
-            if (flag) {
-                sb.append("Y\n");
-            } else {
-                sb.append("N\n");
-            }
+    static long min = Long.MAX_VALUE;
+    static long minID = -1;
+    static long bestTW1 = -1;
+    static long bestTW2 = -1;
+    static long totalWeightTree = 0;
+    public static void main(String[] args) {
+        int nodes = sc.nextInt();
+        Vertex[] graph = unMuGraph(nodes, nodes - 1);
+        dfs(graph[0]);
+        if (minID == -1) {
+            sb.append(minID);
+        } else {
+            sb.append(minID).append(" ").append(Math.min(bestTW1, bestTW2)).append(" ")
+                    .append(Math.max(bestTW1, bestTW2));
         }
         System.out.println(sb);
     }
 
+    static void resetGraph(Vertex[] graph) {
+        for (Vertex vertex : graph) {
+            vertex.visited = false;
+            vertex.totalWeight = vertex.weight;
+        }
+    }
+
+    static void dfs(Vertex v) {
+        v.visited = true;
+        for (Vertex e : v.adjacentList) {
+            if (e.visited == false) {
+                dfs(e);
+                v.totalWeight += e.totalWeight;
+                if (v.adjacentList.size() == 2) {
+                    long tw1 = e.totalWeight;
+                    long tw2 = totalWeightTree - tw1 - v.weight;
+                    long currentDiff = Math.abs(tw1 - tw2);
+                    if (currentDiff < min || currentDiff == min && v.id < minID) {
+                        min = currentDiff;
+                        minID = v.id;
+                        bestTW1 = tw1;
+                        bestTW2 = tw2;
+                    }
+                }
+            }
+        }
+    }
+
+    public static Vertex[] unMuGraph(int vertices, int edges) {
+        Vertex[] graph = graph1(vertices);
+        for (int i = 0; i < edges; i++) {
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            graph[v - 1].adjacentList.add(graph[u - 1]);
+            graph[u - 1].adjacentList.add(graph[v - 1]);
+        }
+        return graph;
+    }
+
+    public static Vertex[] graph1(int vertices) {
+        Vertex[] graph = new Vertex[vertices];
+        for (int i = 1; i <= vertices; i++) {
+            long weight = sc.nextLong();
+            graph[i - 1] = new Vertex(i, weight);
+        }
+        return graph;
+    }
+
     static class Vertex {
         int id;
+        boolean visited = false;
         List<Vertex> adjacentList = new ArrayList<>();
+        long weight = 0;
+        long totalWeight = 0;
 
-        public Vertex(int id) {
+        public Vertex(int id, long weight) {
             this.id = id;
+            this.weight = weight;
+            this.totalWeight = weight;
         }
+
     }
 
     static class InputReader {

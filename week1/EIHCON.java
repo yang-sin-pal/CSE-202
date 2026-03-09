@@ -1,50 +1,66 @@
-﻿import java.io.FileInputStream;
+﻿package week1;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 
-public class EIFACEBOOK {
+public class EIHCON {
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         InputReader sc = new InputReader(System.in);
         int n = sc.nextInt();
         int m = sc.nextInt();
-        Vertex[] graph = new Vertex[n];
+        int q = sc.nextInt();
+        Vertex[] graph = new Vertex[n + 1];
         for (int i = 1; i <= n; i++) {
-            String gender = sc.next();
-            graph[i-1] = new Vertex(i, gender);
+            graph[i] = new Vertex(i);
         }
         for (int i = 0; i < m; i++) {
             int u = sc.nextInt();
             int v = sc.nextInt();
-            if(!graph[u-1].adjacentList.contains(graph[v-1])){
-                graph[v-1].adjacentList.add(graph[u-1]);
-                graph[u-1].adjacentList.add(graph[v-1]);
-            } 
+            graph[v].adjacentList.add(graph[u]);
         }
-        for (int i = 1; i <= n; i++) {
-            int count = 0;
-            for (Vertex vertex : graph[i-1].adjacentList) {
-                if (!vertex.gender.equals(graph[i-1].gender)) {
-                    count++;
+        for (int i = 0; i < q; i++) {
+            boolean flag = false;
+            int a = sc.nextInt();
+            int b = sc.nextInt();
+            for (Vertex vertex : graph[a].adjacentList) {
+                if (vertex.id == b) {
+                    flag = true;
+                    break;
                 }
             }
-            sb.append(count + " ");
+            if (flag == false) {
+                for (Vertex vertex : graph[a].adjacentList) {
+                    for (Vertex vertex2 : vertex.adjacentList) {
+                        if (vertex2.id == b) {
+                            flag = true;
+                            break;
+                        }
+                    }
+                    if (flag) {
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                sb.append("Y\n");
+            } else {
+                sb.append("N\n");
+            }
         }
         System.out.println(sb);
     }
 
     static class Vertex {
         int id;
-        String gender;
         List<Vertex> adjacentList = new ArrayList<>();
 
-        public Vertex(int id, String gender) {
+        public Vertex(int id) {
             this.id = id;
-            this.gender = gender;
         }
     }
 

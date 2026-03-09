@@ -1,55 +1,103 @@
-﻿import java.io.FileInputStream;
+﻿package week2;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
-public class EIUSUFBF {
-static StringBuilder sb = new StringBuilder();
-
-    public static void main(String[] args) throws IOException {
-        InputReader sc = new InputReader(System.in);
+public class EIUBFS1 {
+    static StringBuilder sb = new StringBuilder();
+    static InputReader sc;
+    static {
+        try {
+            sc = new InputReader(System.in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] args) {
         int n = sc.nextInt();
         int m = sc.nextInt();
-        int q = sc.nextInt();
-        Vertex[] graph = new Vertex[n];
-        for (int i = 0; i < n; i++) {
-            graph[i] = new Vertex(i);
-        }
-        for (int i = 0; i < m; i++) {
-            int u = sc.nextInt();
-            int v = sc.nextInt();
-            graph[v].adjacentList.add(graph[u]);
-            graph[u].adjacentList.add(graph[v]);
-        }
-        for (int i = 0; i < n; i++) {
-            List<Vertex> termList = graph[i].adjacentList;
-            sb.append(i + " ");
-            termList.sort((v1,v2) -> {
-                return Integer.compare(v1.id, v2.id);
-            });
-            for (Vertex vertex : termList) {
-                if (vertex.adjacentList.size() < q) {
-                    sb.append(vertex.id + " ");
-                }
-            }
-            sb.append("\n");
-        }
+        // int q = sc.nextInt();
+        performBFS(n, m);
+    }
+
+    
+    public static void performBFS(int vertices, int edges) {
+        Vertex[] graph = diGraph(vertices, edges);
+        sortAdjaList(graph);
+        bfs(graph[0]);
         System.out.println(sb);
     }
 
+    public static void bfs(Vertex v) {
+        Queue<Vertex> queue = new ArrayDeque<>();
+        queue.add(v);
+        v.visited = true;
+        sb.append(v.id + " ");
+        while (queue.size() != 0) {
+            Vertex current = queue.poll();
+            for (Vertex vertex : current.adjacentList) {
+                if (vertex.visited == false) {
+                    queue.add(vertex);
+                    vertex.visited = true;
+                    sb.append(vertex.id + " ");
+                }
+            }
+        }
+    }
+    static void sortAdjaList(Vertex[] graph) {
+        for (Vertex vertex : graph) {
+            vertex.adjacentList.sort((v1, v2) -> {
+                return Integer.compare(v1.id, v2.id);
+            });
+        }
+    }
+    public static Vertex[] diGraph(int vertices, int edges) {
+        Vertex[] graph = graph0(vertices);
+        // Vertex[] graph = graph1(vertices);
+        // Vertex[] graph = humanGraph1(vertices);
+        for (int i = 0; i < edges; i++) { // graph0 i=0, graph1 i=1
+            int u = sc.nextInt();
+            int v = sc.nextInt();
+            // if(!graph[v-1].adjacentList.contains(graph[u-1])){ //graph1, v -> u
+            // graph[v-1].adjacentList.add(graph[u-1]);
+            // }
+
+            if (!graph[u].adjacentList.contains(graph[v])) { // graph0, u ->v
+                graph[u].adjacentList.add(graph[v]);
+            }
+        }
+        return graph;
+    }
+    public static Vertex[] graph0(int vertices) {
+        Vertex[] graph = new Vertex[vertices];
+        for (int i = 0; i < vertices; i++) {
+            graph[i] = new Vertex(i);
+        }
+        return graph;
+    }
     static class Vertex {
         int id;
+        String gender;
+        boolean visited = false;
         List<Vertex> adjacentList = new ArrayList<>();
 
         public Vertex(int id) {
             this.id = id;
-            
+
+        }
+
+        public Vertex(int id, String gender) {
+            this.id = id;
+            this.gender = gender;
         }
 
     }
-
     static class InputReader {
         private byte[] inbuf = new byte[2 << 23];
         public int lenbuf = 0, ptrbuf = 0;
@@ -176,5 +224,5 @@ static StringBuilder sb = new StringBuilder();
                 b = readByte();
             }
         }
-    }   
+    }
 }
