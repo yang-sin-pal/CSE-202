@@ -1,84 +1,78 @@
 ﻿package week7;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
+import java.io.*;
 
 public class EIMINDISTA {
     static StringBuilder sb = new StringBuilder();
-    static InputReader sc;
-    static {
-        try {
-            sc = new InputReader(System.in);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    } 
-    public static void main(String[] args) {
-        int vertices = sc.nextInt();
-        int edges = sc.nextInt();
-        Vertex[] graph = new Vertex[vertices];
-        for (int i = 0; i < graph.length; i++) {
+
+    public static void main(String[] args) throws IOException {
+        InputReader sc = new InputReader(System.in);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        Vertex[] graph = new Vertex[n];
+        for (int i = 0; i < n; i++) {
             graph[i] = new Vertex(i);
         }
-        for (int i = 0; i < edges; i++) {
+        for (int i = 0; i < m; i++) {
             int u = sc.nextInt();
             int v = sc.nextInt();
-            int length = sc.nextInt();
-            graph[u].addEdge(length, graph[v]);
-            graph[v].addEdge(length, graph[u]);
+            long w = sc.nextLong();
+            graph[u].adjacentVertices.add(new Edge(graph[v], w));
+            graph[v].adjacentVertices.add(new Edge(graph[u], w));
         }
-        dijkstra(graph[0]);
-    }
-    static void dijkstra(Vertex source){
-        PriorityQueue<Vertex> queue = new PriorityQueue<>((v1, v2) -> Long.compare(v1.shortestDist, v2.shortestDist));
-        source.shortestDist = 0;
-        queue.add(source);
-        
-        while (!queue.isEmpty()) {
-            Vertex cuVertex = queue.remove();
-            
-            for (Edge adEdge : cuVertex.edges) {
-                Vertex endVertex = adEdge.endVertex;
-                long tempDist = adEdge.length + cuVertex.shortestDist;
-                if (tempDist < endVertex.shortestDist) {
-                    endVertex.shortestDist = tempDist;
-                    endVertex.preVertex = cuVertex;
-                    Vertex clone = new Vertex(endVertex.id);
-                    clone.shortestDist = endVertex.shortestDist;
-                    clone.preVertex = endVertex.preVertex;
-                    queue.add(clone);
-                }
-
+        dijaska(graph[0], graph);
+        for (int i = 1; i < n; i++) {
+            if (graph[i].dist == Long.MAX_VALUE) {
+                sb.append(-1);
+            } else {
+                sb.append(graph[i].dist);
+            }
+            if (i < n - 1) {
+                sb.append(" ");
             }
         }
+        System.out.println(sb);
     }
+
+    static void dijaska(Vertex v, Vertex[] graph) {
+        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>((s1, s2) -> Long.compare(s1.dist, s2.dist));
+        v.dist = 0;
+        priorityQueue.add(v);
+        while (!priorityQueue.isEmpty()) {
+            Vertex current = priorityQueue.poll();
+            Vertex orginVertex = graph[current.id];
+            for (Edge edge : orginVertex.adjacentVertices) {
+                Vertex e = edge.endpoint;
+                long alt = edge.weight + current.dist;
+                if (alt < e.dist) {
+                    e.dist = alt;
+                    priorityQueue.add(e);
+                }
+            }
+
+        }
+    }
+
     static class Vertex {
-        int id;
-        List<Edge> edges = new ArrayList<>();
-        long shortestDist = Long.MAX_VALUE;
-        Vertex preVertex = null;
+        public int id;
+        public boolean visited = false;
+
+        long dist = Long.MAX_VALUE;
+        public List<Edge> adjacentVertices = new ArrayList<>();
 
         public Vertex(int id) {
             this.id = id;
         }
 
-        public void addEdge(int distance, Vertex preVertex) {
-            edges.add(new Edge(distance, preVertex));
-        }
     }
 
     static class Edge {
-        int length;
-        Vertex endVertex;
+        public long weight;
+        public Vertex endpoint;
 
-        public Edge(int length, Vertex endVertex) {
-            this.length = length;
-            this.endVertex = endVertex;
+        public Edge(Vertex endpoint, long w) {
+            this.endpoint = endpoint;
+            this.weight = w;
         }
     }
 

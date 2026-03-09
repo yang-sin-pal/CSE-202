@@ -1,84 +1,79 @@
 ﻿package week7;
+
 import java.util.*;
 import java.io.*;
 
- public class EIUWBT {
-    static long min = Long.MAX_VALUE;
-    static long minId = -1;
-    static long bestTw1 = -1;
-    static long bestTw2 = -1;
-    static long totalWeightTree = 0;
+public class EIMINSPAN {
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         InputReader sc = new InputReader(System.in);
-        StringBuilder sb = new StringBuilder();
         int n = sc.nextInt();
-        Vertex[] graph = new Vertex[n + 1];
-        for (int i = 1; i <= n; i++) {
-            long weight = sc.nextLong();
-            graph[i] = new Vertex(i, weight);
-            totalWeightTree += weight;
-
+        int m = sc.nextInt();
+        Vertex[] graph = new Vertex[n];
+        for (int i = 0; i < n; i++) {
+            graph[i] = new Vertex(i);
         }
-        for (int i = 0; i < n - 1; i++) {
+        for (int i = 0; i < m; i++) {
             int u = sc.nextInt();
             int v = sc.nextInt();
-            graph[u].adjenctionList.add(graph[v]);
-            graph[v].adjenctionList.add(graph[u]);
+            long w = sc.nextLong();
+            graph[u].adjacentVertices.add(new Edge(graph[v], w));
+            graph[v].adjacentVertices.add(new Edge(graph[u], w));
         }
-        dfs(graph[1]);
-        if (minId == -1) {
-            sb.append(-1);
-        } else {
 
-            sb.append(minId + " " + Math.min(bestTw1, bestTw2) + " " + Math.max(bestTw1, bestTw2));
-        }
-        System.out.println(sb);
+        System.out.println(prims(graph));
 
     }
 
-    static void resetGraph(Vertex[] graph) {
-        for (int i = 1; i < graph.length; i++) {
-            graph[i].visited = false;
-            graph[i].totalWeight = graph[i].weight;
-        }
-    }
+    static long prims(Vertex[] graph) {
+        PriorityQueue<Edge> priorityQueue = new PriorityQueue<>((s1, s2) -> Long.compare(s1.weight, s2.weight));
+        priorityQueue.add(new Edge(graph[0], 0));
+        int count = 0;
+        long total = 0;
+        while (!priorityQueue.isEmpty()) {
+            Edge currentEdge = priorityQueue.poll();
+            Vertex current = currentEdge.endpoint;
+            if (current.visited) {
+                continue;
+            }
+            current.visited = true;
+            total += currentEdge.weight;
+            count++;
+            if (count == graph.length) {
+                return total;
+            }
 
-    static void dfs(Vertex v) {
-        v.visited = true;
-        for (Vertex e : v.adjenctionList) {
-            if (e.visited == false) {
-                dfs(e);
-                v.totalWeight += e.totalWeight;
-                if (v.adjenctionList.size() == 2) {
-                    long tw1 = e.totalWeight;
-                    long tw2 = totalWeightTree - tw1 - v.weight;
-                    long currentDiff = Math.abs(tw1 - tw2);
-                    if (currentDiff < min || currentDiff == min && v.id < minId) {
-                        min = currentDiff;
-                        minId = v.id;
-                        bestTw1 = tw1;
-                        bestTw2 = tw2;
-                    }
+            for (Edge edge : current.adjacentVertices) {
+                Vertex e = edge.endpoint;
+                if (!e.visited) {
+                    priorityQueue.add(edge);
                 }
             }
+
         }
+        return -1;
     }
 
     static class Vertex {
-        int id;
-        boolean visited;
-        long totalWeight;
-        long weight;
-        List<Vertex> adjenctionList = new ArrayList<>();
+        public int id;
+        public boolean visited = false;
+        public long dist = Long.MAX_VALUE;
+        public List<Edge> adjacentVertices = new ArrayList<>();
 
-        public Vertex(int id, long weight) {
+        public Vertex(int id) {
             this.id = id;
-            this.weight = weight;
-            this.totalWeight = weight;
-
         }
+    }
 
+    static class Edge {
+        public Vertex endpoint;
+        public long weight;
+
+        public Edge(Vertex endpoint, long weight) {
+            this.endpoint = endpoint;
+            this.weight = weight;
+        }
     }
 
     static class InputReader {
