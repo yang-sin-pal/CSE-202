@@ -6,9 +6,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.PriorityQueue;
 
-public class EIMINDISTA {
+public class EIMINSPAN {
     static StringBuilder sb = new StringBuilder();
     static InputReader sc;
     static {
@@ -22,56 +21,31 @@ public class EIMINDISTA {
     public static void main(String[] args) {
         int vertices = sc.nextInt();
         int edges = sc.nextInt();
-        Vertex[] graph = new Vertex[vertices];
-        for (int i = 0; i < graph.length; i++) {
-            graph[i] = new Vertex(i);
-        }
+        Vertex[] graph = unSiGraph0(vertices, edges);
+
+    }
+
+    static Vertex[] unSiGraph0 (int vertices, int edges) {
+        Vertex[] graph = graph0(vertices);
         for (int i = 0; i < edges; i++) {
             int u = sc.nextInt();
             int v = sc.nextInt();
             int length = sc.nextInt();
-            graph[u].addEdge(length, graph[v]);
-            graph[v].addEdge(length, graph[u]);
-        }
-        dijkstra(graph[0]);
-        for (int i = 1; i < graph.length; i++) {
-            long distanceTo0 = graph[i].shortestDist;
-            if (distanceTo0 == Long.MAX_VALUE) {
-                sb.append(-1).append(" ");
-            } else {
-                sb.append(distanceTo0).append(" ");
+            if (!graph[u].edges.contains(graph[v])) {
+                graph[u].addEdge(length, graph[v]);
+                graph[v].addEdge(length, graph[u]);
             }
         }
-        System.out.println(sb);
+        return graph;
     }
 
-    static void dijkstra(Vertex source) {
-        PriorityQueue<Vertex> queue = new PriorityQueue<>((v1, v2) -> Long.compare(v1.shortestDist, v2.shortestDist));
-        source.shortestDist = 0;
-        queue.add(source);
-
-        while (!queue.isEmpty()) {
-            Vertex cuVertex = queue.remove();
-
-            for (Edge adEdge : cuVertex.edges) {
-                Vertex endVertex = adEdge.endVertex;
-                long tempDist = adEdge.length + cuVertex.shortestDist;
-
-                if (tempDist < endVertex.shortestDist) {
-                    endVertex.shortestDist = tempDist;
-                    endVertex.preVertex = cuVertex;
-
-                    Vertex clone = new Vertex(endVertex.id);
-                    clone.shortestDist = endVertex.shortestDist;
-                    clone.preVertex = endVertex.preVertex;
-                    clone.edges = endVertex.edges;
-                    
-                    queue.add(clone);
-                }
-            }
+    static Vertex[] graph0 (int vertices) {
+        Vertex[] graph = new Vertex[vertices];
+        for (int i = 0; i < graph.length; i++) {
+            graph[i] = new Vertex(i);
         }
+        return graph;
     }
-
     static class Vertex {
         int id;
         List<Edge> edges = new ArrayList<>();

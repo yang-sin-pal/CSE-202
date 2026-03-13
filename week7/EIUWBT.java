@@ -18,7 +18,7 @@ public class EIUWBT {
         }
     }
 
-    static long min = Long.MAX_VALUE;
+    static long minDiff = Long.MAX_VALUE;
     static long minID = -1;
     static long bestTW1 = -1;
     static long bestTW2 = -1;
@@ -53,8 +53,8 @@ public class EIUWBT {
                     long tw1 = e.totalWeight;
                     long tw2 = totalWeightTree - tw1 - v.weight;
                     long currentDiff = Math.abs(tw1 - tw2);
-                    if (currentDiff < min || currentDiff == min && v.id < minID) {
-                        min = currentDiff;
+                    if (currentDiff < minDiff || currentDiff == minDiff && v.id < minID) {
+                        minDiff = currentDiff;
                         minID = v.id;
                         bestTW1 = tw1;
                         bestTW2 = tw2;
@@ -79,6 +79,7 @@ public class EIUWBT {
         Vertex[] graph = new Vertex[vertices];
         for (int i = 1; i <= vertices; i++) {
             long weight = sc.nextLong();
+            totalWeightTree += weight;
             graph[i - 1] = new Vertex(i, weight);
         }
         return graph;
