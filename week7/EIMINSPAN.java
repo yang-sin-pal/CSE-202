@@ -58,7 +58,6 @@ public class EIMINSPAN {
     static class Vertex {
         public int id;
         public boolean visited = false;
-        public long dist = Long.MAX_VALUE;
         public List<Edge> adjacentVertices = new ArrayList<>();
 
         public Vertex(int id) {
@@ -204,4 +203,4 @@ public class EIMINSPAN {
         }
     }
 
-}
+ }

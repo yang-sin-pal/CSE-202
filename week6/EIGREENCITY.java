@@ -29,7 +29,6 @@ public class EIGREENCITY {
             if (vertex.adjacentList.isEmpty()) {
                 countLeaves++;
             }
-        }
         for (int i = 0; i < countLeaves; i++) {
             int vertexId = sc.nextInt();
             int trees = sc.nextInt();
